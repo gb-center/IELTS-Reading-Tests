@@ -635,5 +635,30 @@ $("#submit").onclick = function(){
 /* ============ INIT ============ */
 build(); setPart(0); renderNav(); $("#split").style.setProperty("--fs", fs); showIntro();
 </script>
+
+<script>
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const className = params.get('class') || params.get('className') || '';
+  const studentName = params.get('student') || params.get('studentName') || '';
+  const skillParam = (params.get('skill') || 'reading').toLowerCase();
+  const week = params.get('week') || '';
+  const labels = {reading:'Reading', listening:'Listening', writing:'Writing', speaking:'Speaking'};
+  const label = labels[skillParam] || labels['reading'];
+  const title = document.querySelector('header .title b');
+  const subtitle = document.querySelector('header .title small');
+  if (title) title.textContent = label;
+  if (subtitle) {
+    const bits = [];
+    if (className) bits.push(className);
+    if (studentName) bits.push(studentName);
+    if (week) bits.push('Week ' + String(week).padStart(2, '0'));
+    bits.push('Practice mode');
+    subtitle.textContent = bits.join(' · ');
+  }
+  document.title = (label || 'Reading') + ' – Practice Test';
+})();
+</script>
+
 </body>
 </html>

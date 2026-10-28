@@ -92,20 +92,33 @@ button,a,input{transition:all .16s ease}
   </section>
 </main>
 
+
+<div id="pin-modal" class="hidden fixed inset-0 z-[60] modal-backdrop items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+    <form id="pin-form" class="p-6 space-y-4">
+      <div class="w-11 h-11 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center"><i data-lucide="lock-keyhole" class="w-5 h-5"></i></div>
+      <div><h3 class="font-extrabold text-slate-900 text-lg">Xác nhận giáo viên</h3><p class="text-sm text-slate-500 mt-1">Nhập mã PIN để chỉnh sửa đường dẫn bài tập.</p></div>
+      <input id="pin-input" class="field" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="Nhập mã PIN" aria-label="Mã PIN">
+      <p id="pin-error" class="hidden text-sm font-semibold text-rose-600">Mã PIN chưa đúng. Thử lại nhé.</p>
+      <div class="flex justify-end gap-2"><button type="button" id="pin-cancel" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">Hủy</button><button type="submit" class="primary-btn"><i data-lucide="unlock" class="w-4 h-4"></i>Xác nhận</button></div>
+    </form>
+  </div>
+</div>
+
 <div id="edit-modal" class="hidden fixed inset-0 z-50 modal-backdrop items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
     <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
-      <div><h3 class="font-extrabold text-slate-900">Cài đặt bài Practice Test</h3><p class="text-xs text-slate-500 mt-1">Nhập tên lớp và link cho từng kỹ năng.</p></div>
+      <div><h3 class="font-extrabold text-slate-900">Cài đặt bài Practice Test</h3><p class="text-xs text-slate-500 mt-1">Nhập tên lớp, tuần và link cho từng kỹ năng. Reading/Listening đã được liên kết sẵn.</p></div>
       <button id="close-modal" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500" aria-label="Đóng"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form id="settings-form" class="p-5 space-y-4">
       <div><label for="class-name-input" class="block text-xs font-bold text-slate-600 mb-1.5">Tên lớp</label><input id="class-name-input" class="field" placeholder="Ví dụ: IELTS IE01" maxlength="80"></div>
       <div><label for="week-input" class="block text-xs font-bold text-slate-600 mb-1.5">Tuần hiển thị</label><input id="week-input" class="field" type="number" min="1" max="99" placeholder="Tự tính theo ngày hiện tại"></div>
       <div class="space-y-3">
-        <div><label for="reading-url" class="block text-xs font-bold text-slate-600 mb-1.5">Reading URL</label><input id="reading-url" class="field" type="url" placeholder="https://..."></div>
-        <div><label for="listening-url" class="block text-xs font-bold text-slate-600 mb-1.5">Listening URL</label><input id="listening-url" class="field" type="url" placeholder="https://..."></div>
-        <div><label for="writing-url" class="block text-xs font-bold text-slate-600 mb-1.5">Writing URL</label><input id="writing-url" class="field" type="url" placeholder="https://..."></div>
-        <div><label for="speaking-url" class="block text-xs font-bold text-slate-600 mb-1.5">Speaking URL</label><input id="speaking-url" class="field" type="url" placeholder="https://..."></div>
+        <div><label for="reading-url" class="block text-xs font-bold text-slate-600 mb-1.5">Reading URL</label><input id="reading-url" class="field" type="text" placeholder="Reading.html or https://..."></div>
+        <div><label for="listening-url" class="block text-xs font-bold text-slate-600 mb-1.5">Listening URL</label><input id="listening-url" class="field" type="text" placeholder="Listening.html or https://..."></div>
+        <div><label for="writing-url" class="block text-xs font-bold text-slate-600 mb-1.5">Writing URL</label><input id="writing-url" class="field" type="text" placeholder="https://..."></div>
+        <div><label for="speaking-url" class="block text-xs font-bold text-slate-600 mb-1.5">Speaking URL</label><input id="speaking-url" class="field" type="text" placeholder="https://..."></div>
       </div>
       <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2"><button type="button" id="cancel-modal" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">Hủy</button><button type="submit" class="primary-btn"><i data-lucide="save" class="w-4 h-4"></i>Lưu cài đặt</button></div>
     </form>
@@ -114,7 +127,7 @@ button,a,input{transition:all .16s ease}
 
 <script>
 (() => {
-  const STORAGE_KEY = 'practice_test_class_page_v1';
+  const STORAGE_KEY = 'practice_test_class_page_v1::' + window.location.pathname;
   const START_DATE = new Date(2026, 8, 7); // 07/09/2026, tuần 01
   const skills = ['reading','listening','writing','speaking'];
   const skillLabels = {reading:'Reading', listening:'Listening', writing:'Writing', speaking:'Speaking'};
@@ -131,12 +144,18 @@ button,a,input{transition:all .16s ease}
   const pageParams = new URLSearchParams(window.location.search);
   const urlClassName = pageParams.get('class') || pageParams.get('className') || '';
   const studentName = pageParams.get('student') || pageParams.get('studentName') || '';
-  let data = {className:'Tên lớp', week:currentWeek, links:{reading:'',listening:'',writing:'',speaking:''}};
+  const DEFAULT_WEEK = 8; // Khi duplicate cho tuần khác, đổi số này (ví dụ 9, 10...). URL ?week=... sẽ được ưu tiên.
+  const folderName = (() => { try { const parts = decodeURIComponent(window.location.pathname).split('/').filter(Boolean); return parts.length > 1 ? parts[parts.length-2] : ''; } catch(e) { return ''; } })();
+  let data = {className: urlClassName || folderName || 'Tên lớp', week:DEFAULT_WEEK || currentWeek, links:{reading:'Reading.html',listening:'Listening.html',writing:'',speaking:''}};
   try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if(saved && typeof saved==='object') data = {...data,...saved,links:{...data.links,...(saved.links||{})}}; } catch(e) {}
   // If the saved week is stale, follow the current week unless the teacher explicitly set a different week.
   if (!data.week || Number(data.week) < 1) data.week = currentWeek;
   // Explicit URL parameters override the saved class label; student identity is passed to each exercise link.
   if (urlClassName) data.className = urlClassName;
+  const urlWeek = Number(pageParams.get('week'));
+  if (urlWeek >= 1 && urlWeek <= 99) data.week = urlWeek;
+  if (!data.links.reading) data.links.reading = 'Reading.html';
+  if (!data.links.listening) data.links.listening = 'Listening.html';
 
   function render() {
     $('page-class-name').textContent = data.className || 'Lớp học';
@@ -148,7 +167,7 @@ button,a,input{transition:all .16s ease}
     document.querySelectorAll('[data-skill]').forEach(card => {
       const skill = card.dataset.skill, url = (data.links[skill] || '').trim();
       const a = card.querySelector('.open-link'), status = card.querySelector('.skill-status');
-      if (url && /^https?:\/\//i.test(url)) {
+      if (url && !/^javascript:/i.test(url)) {
         count++; card.classList.add('has-link');
         // Pass class, student, skill and week metadata to the exercise page.
         const targetUrl = new URL(url, window.location.href);
@@ -175,7 +194,22 @@ button,a,input{transition:all .16s ease}
     if (window.lucide) lucide.createIcons();
   }
   function closeModal() { $('edit-modal').classList.add('hidden'); $('edit-modal').classList.remove('flex'); }
-  $('teacher-edit-btn').addEventListener('click', openModal);
+  function openPinModal() {
+    $('pin-input').value = '';
+    $('pin-error').classList.add('hidden');
+    $('pin-modal').classList.remove('hidden'); $('pin-modal').classList.add('flex');
+    setTimeout(() => $('pin-input').focus(), 50);
+    if (window.lucide) lucide.createIcons();
+  }
+  function closePinModal() { $('pin-modal').classList.add('hidden'); $('pin-modal').classList.remove('flex'); }
+  $('teacher-edit-btn').addEventListener('click', openPinModal);
+  $('pin-cancel').addEventListener('click', closePinModal);
+  $('pin-modal').addEventListener('click', e => { if(e.target === $('pin-modal')) closePinModal(); });
+  $('pin-form').addEventListener('submit', e => {
+    e.preventDefault();
+    if ($('pin-input').value === '0208') { closePinModal(); openModal(); }
+    else { $('pin-error').classList.remove('hidden'); $('pin-input').select(); }
+  });
   $('close-modal').addEventListener('click', closeModal);
   $('cancel-modal').addEventListener('click', closeModal);
   $('edit-modal').addEventListener('click', e => { if(e.target === $('edit-modal')) closeModal(); });
@@ -185,7 +219,7 @@ button,a,input{transition:all .16s ease}
     data.week = Math.max(1, Math.min(99, Number($('week-input').value) || currentWeek));
     skills.forEach(s => {
       let url = $(s+'-url').value.trim();
-      if(url && !/^https?:\/\//i.test(url)) url = '';
+      if(url && /^javascript:/i.test(url)) url = '';
       data.links[s] = url;
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
