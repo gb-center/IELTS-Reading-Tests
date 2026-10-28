@@ -68,22 +68,22 @@ button,a,input{transition:all .16s ease}
     <article class="skill-card" data-skill="reading">
       <div class="flex items-start justify-between"><div class="skill-icon"><i data-lucide="book-open" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 01</span></div>
       <div><h4 class="font-extrabold text-slate-900 text-lg">Reading</h4><p class="text-sm text-slate-500 mt-1">Đọc hiểu và trả lời câu hỏi.</p></div>
-      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_self" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
     </article>
     <article class="skill-card" data-skill="listening">
       <div class="flex items-start justify-between"><div class="skill-icon" style="background:#dcfce7;color:#15803d"><i data-lucide="headphones" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 02</span></div>
       <div><h4 class="font-extrabold text-slate-900 text-lg">Listening</h4><p class="text-sm text-slate-500 mt-1">Nghe thông tin và hoàn thành bài.</p></div>
-      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_self" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
     </article>
     <article class="skill-card" data-skill="writing">
       <div class="flex items-start justify-between"><div class="skill-icon" style="background:#fef3c7;color:#b45309"><i data-lucide="pen-line" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 03</span></div>
       <div><h4 class="font-extrabold text-slate-900 text-lg">Writing</h4><p class="text-sm text-slate-500 mt-1">Viết câu trả lời theo yêu cầu.</p></div>
-      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_self" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
     </article>
     <article class="skill-card" data-skill="speaking">
       <div class="flex items-start justify-between"><div class="skill-icon" style="background:#f3e8ff;color:#7e22ce"><i data-lucide="mic" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 04</span></div>
       <div><h4 class="font-extrabold text-slate-900 text-lg">Speaking</h4><p class="text-sm text-slate-500 mt-1">Luyện nói theo chủ đề hoặc đề bài.</p></div>
-      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_self" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
     </article>
   </section>
 
@@ -144,16 +144,17 @@ button,a,input{transition:all .16s ease}
   const pageParams = new URLSearchParams(window.location.search);
   const urlClassName = pageParams.get('class') || pageParams.get('className') || '';
   const studentName = pageParams.get('student') || pageParams.get('studentName') || '';
-  const DEFAULT_WEEK = 8; // Khi duplicate cho tuần khác, đổi số này (ví dụ 9, 10...). URL ?week=... sẽ được ưu tiên.
+  // Mặc định tự tính tuần hiện tại từ 07/09/2026; chỉ dùng tuần khác nếu URL có ?week=NN.
   const folderName = (() => { try { const parts = decodeURIComponent(window.location.pathname).split('/').filter(Boolean); return parts.length > 1 ? parts[parts.length-2] : ''; } catch(e) { return ''; } })();
-  let data = {className: urlClassName || folderName || 'Tên lớp', week:DEFAULT_WEEK || currentWeek, links:{reading:'Reading.html',listening:'Listening.html',writing:'',speaking:''}};
+  let data = {className: urlClassName || folderName || 'Tên lớp', week:currentWeek, links:{reading:'Reading.html',listening:'Listening.html',writing:'',speaking:''}};
   try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if(saved && typeof saved==='object') data = {...data,...saved,links:{...data.links,...(saved.links||{})}}; } catch(e) {}
-  // If the saved week is stale, follow the current week unless the teacher explicitly set a different week.
-  if (!data.week || Number(data.week) < 1) data.week = currentWeek;
+  // Không dùng tuần cũ lưu trong localStorage: mặc định luôn theo tuần hiện tại.
+  data.week = currentWeek;
   // Explicit URL parameters override the saved class label; student identity is passed to each exercise link.
   if (urlClassName) data.className = urlClassName;
-  const urlWeek = Number(pageParams.get('week'));
-  if (urlWeek >= 1 && urlWeek <= 99) data.week = urlWeek;
+  const rawUrlWeek = pageParams.get('week');
+  const urlWeek = Number(rawUrlWeek);
+  if (rawUrlWeek && urlWeek >= 1 && urlWeek <= 99) data.week = urlWeek;
   if (!data.links.reading) data.links.reading = 'Reading.html';
   if (!data.links.listening) data.links.listening = 'Listening.html';
 
