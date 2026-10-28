@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Test | Cổng học viên</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#0284c7;--accent-dark:#075985;--border:#dbeafe;--muted:#64748b;--bg:#f3f9ff}
+*{box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:#172033;letter-spacing:-.01em}
+button,a,input{transition:all .16s ease}
+.skill-card{border:1px solid #dbe4ee;background:#fff;border-radius:18px;padding:20px;min-height:185px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(15,23,42,.025)}
+.skill-card.has-link{border-color:#bae6fd}
+.skill-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#e0f2fe;color:#0369a1}
+.pill-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 13px;border:1px solid #bae6fd;border-radius:999px;background:#f0f9ff;color:#0369a1;font-size:12px;font-weight:700}
+.pill-btn:hover{background:#e0f2fe;border-color:#7dd3fc;transform:translateY(-1px)}
+.primary-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:12px;background:#0284c7;color:white;font-size:12px;font-weight:700}
+.primary-btn:hover{background:#0369a1;transform:translateY(-1px)}
+.field{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:13px;background:white}
+.field:focus{outline:none;border-color:#0284c7;box-shadow:0 0 0 3px rgba(14,165,233,.14)}
+.modal-backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(3px)}
+@media(max-width:640px){.skill-card{min-height:0;padding:16px}}
+</style>
+</head>
+<body class="min-h-screen">
+<header class="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white shrink-0"><i data-lucide="book-open-check" class="w-5 h-5"></i></div>
+      <div class="min-w-0">
+        <div class="text-xs text-slate-500 font-semibold">CỔNG HỌC VIÊN</div>
+        <h1 id="page-class-name" class="font-extrabold text-slate-900 text-base sm:text-lg truncate">Lớp học</h1>
+      </div>
+    </div>
+    <button id="teacher-edit-btn" class="pill-btn shrink-0"><i data-lucide="settings-2" class="w-4 h-4"></i><span>Chỉnh link</span></button>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+  <section class="rounded-2xl p-5 sm:p-7 text-white shadow-sm bg-gradient-to-r from-[#285f83] to-[#244a66]">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full bg-white/15 text-sky-100"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span id="week-label">Week 08</span></div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold mt-3">Practice Test</h2>
+        <p class="text-sm text-sky-100 mt-1">Chọn kỹ năng để bắt đầu làm bài. Kỹ năng chưa có link sẽ được đánh dấu là chưa sẵn sàng.</p>
+      </div>
+      <div class="sm:text-right">
+        <div id="week-dates" class="text-sm font-semibold text-white">26 Oct – 01 Nov 2026</div>
+        <div class="text-xs text-sky-100 mt-1">Tuần được tính từ ngày 07/09/2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <div>
+      <h3 class="text-base font-extrabold text-slate-900">Kỹ năng bài thi</h3>
+      <p class="text-sm text-slate-500 mt-1">Bấm “Mở bài” khi giáo viên đã thêm đường dẫn.</p>
+    </div>
+    <div id="progress-label" class="text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-full px-3 py-2">0/4 kỹ năng có link</div>
+  </section>
+
+  <section id="skills-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <article class="skill-card" data-skill="reading">
+      <div class="flex items-start justify-between"><div class="skill-icon"><i data-lucide="book-open" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 01</span></div>
+      <div><h4 class="font-extrabold text-slate-900 text-lg">Reading</h4><p class="text-sm text-slate-500 mt-1">Đọc hiểu và trả lời câu hỏi.</p></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+    </article>
+    <article class="skill-card" data-skill="listening">
+      <div class="flex items-start justify-between"><div class="skill-icon" style="background:#dcfce7;color:#15803d"><i data-lucide="headphones" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 02</span></div>
+      <div><h4 class="font-extrabold text-slate-900 text-lg">Listening</h4><p class="text-sm text-slate-500 mt-1">Nghe thông tin và hoàn thành bài.</p></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+    </article>
+    <article class="skill-card" data-skill="writing">
+      <div class="flex items-start justify-between"><div class="skill-icon" style="background:#fef3c7;color:#b45309"><i data-lucide="pen-line" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 03</span></div>
+      <div><h4 class="font-extrabold text-slate-900 text-lg">Writing</h4><p class="text-sm text-slate-500 mt-1">Viết câu trả lời theo yêu cầu.</p></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+    </article>
+    <article class="skill-card" data-skill="speaking">
+      <div class="flex items-start justify-between"><div class="skill-icon" style="background:#f3e8ff;color:#7e22ce"><i data-lucide="mic" class="w-6 h-6"></i></div><span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Skill 04</span></div>
+      <div><h4 class="font-extrabold text-slate-900 text-lg">Speaking</h4><p class="text-sm text-slate-500 mt-1">Luyện nói theo chủ đề hoặc đề bài.</p></div>
+      <div class="mt-auto flex items-center justify-between gap-2"><span class="skill-status text-xs font-semibold text-slate-400">Chưa có link</span><a class="open-link pill-btn opacity-50 pointer-events-none" href="#" target="_blank" rel="noopener"><i data-lucide="external-link" class="w-3.5 h-3.5"></i>Mở bài</a></div>
+    </article>
+  </section>
+
+  <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex items-start gap-3"><div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center shrink-0"><i data-lucide="info" class="w-5 h-5"></i></div><div><h3 class="font-bold text-slate-800 text-sm">Lưu ý</h3><p class="text-xs sm:text-sm text-slate-500 mt-1">Các đường dẫn được cài đặt trên trình duyệt hiện tại. Để giáo viên và học viên cùng thấy link trên nhiều thiết bị, cần kết nối cơ sở dữ liệu chung.</p></div></div>
+  </section>
+</main>
+
+<div id="edit-modal" class="hidden fixed inset-0 z-50 modal-backdrop items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between gap-3">
+      <div><h3 class="font-extrabold text-slate-900">Cài đặt bài Practice Test</h3><p class="text-xs text-slate-500 mt-1">Nhập tên lớp và link cho từng kỹ năng.</p></div>
+      <button id="close-modal" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500" aria-label="Đóng"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <form id="settings-form" class="p-5 space-y-4">
+      <div><label for="class-name-input" class="block text-xs font-bold text-slate-600 mb-1.5">Tên lớp</label><input id="class-name-input" class="field" placeholder="Ví dụ: IELTS IE01" maxlength="80"></div>
+      <div><label for="week-input" class="block text-xs font-bold text-slate-600 mb-1.5">Tuần hiển thị</label><input id="week-input" class="field" type="number" min="1" max="99" placeholder="Tự tính theo ngày hiện tại"></div>
+      <div class="space-y-3">
+        <div><label for="reading-url" class="block text-xs font-bold text-slate-600 mb-1.5">Reading URL</label><input id="reading-url" class="field" type="url" placeholder="https://..."></div>
+        <div><label for="listening-url" class="block text-xs font-bold text-slate-600 mb-1.5">Listening URL</label><input id="listening-url" class="field" type="url" placeholder="https://..."></div>
+        <div><label for="writing-url" class="block text-xs font-bold text-slate-600 mb-1.5">Writing URL</label><input id="writing-url" class="field" type="url" placeholder="https://..."></div>
+        <div><label for="speaking-url" class="block text-xs font-bold text-slate-600 mb-1.5">Speaking URL</label><input id="speaking-url" class="field" type="url" placeholder="https://..."></div>
+      </div>
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2"><button type="button" id="cancel-modal" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50">Hủy</button><button type="submit" class="primary-btn"><i data-lucide="save" class="w-4 h-4"></i>Lưu cài đặt</button></div>
+    </form>
+  </div>
+</div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'practice_test_class_page_v1';
+  const START_DATE = new Date(2026, 8, 7); // 07/09/2026, tuần 01
+  const skills = ['reading','listening','writing','speaking'];
+  const skillLabels = {reading:'Reading', listening:'Listening', writing:'Writing', speaking:'Speaking'};
+  const $ = (id) => document.getElementById(id);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diffDays = Math.floor((today - START_DATE) / 86400000);
+  const currentWeek = Math.max(1, Math.floor(diffDays / 7) + 1);
+  const weekStart = new Date(START_DATE);
+  weekStart.setDate(weekStart.getDate() + (currentWeek - 1) * 7);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,' ');
+  let data = {className:'Tên lớp', week:currentWeek, links:{reading:'',listening:'',writing:'',speaking:''}};
+  try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if(saved && typeof saved==='object') data = {...data,...saved,links:{...data.links,...(saved.links||{})}}; } catch(e) {}
+  // If the saved week is stale, follow the current week unless the teacher explicitly set a different week.
+  if (!data.week || Number(data.week) < 1) data.week = currentWeek;
+
+  function render() {
+    $('page-class-name').textContent = data.className || 'Lớp học';
+    const start = new Date(START_DATE); start.setDate(start.getDate() + (Number(data.week)-1)*7);
+    const end = new Date(start); end.setDate(end.getDate()+6);
+    $('week-label').textContent = 'Week ' + String(data.week).padStart(2,'0');
+    $('week-dates').textContent = fmt(start) + ' – ' + fmt(end);
+    let count = 0;
+    document.querySelectorAll('[data-skill]').forEach(card => {
+      const skill = card.dataset.skill, url = (data.links[skill] || '').trim();
+      const a = card.querySelector('.open-link'), status = card.querySelector('.skill-status');
+      if (url && /^https?:\/\//i.test(url)) {
+        count++; card.classList.add('has-link');
+        a.href = url; a.classList.remove('opacity-50','pointer-events-none');
+        status.textContent = 'Sẵn sàng'; status.className = 'skill-status text-xs font-bold text-emerald-600';
+      } else {
+        card.classList.remove('has-link');
+        a.href = '#'; a.classList.add('opacity-50','pointer-events-none');
+        status.textContent = 'Chưa có link'; status.className = 'skill-status text-xs font-semibold text-slate-400';
+      }
+    });
+    $('progress-label').textContent = count + '/4 kỹ năng có link';
+    if (window.lucide) lucide.createIcons();
+  }
+  function openModal() {
+    $('class-name-input').value = data.className || '';
+    $('week-input').value = data.week || currentWeek;
+    skills.forEach(s => $(s+'-url').value = data.links[s] || '');
+    $('edit-modal').classList.remove('hidden'); $('edit-modal').classList.add('flex');
+    if (window.lucide) lucide.createIcons();
+  }
+  function closeModal() { $('edit-modal').classList.add('hidden'); $('edit-modal').classList.remove('flex'); }
+  $('teacher-edit-btn').addEventListener('click', openModal);
+  $('close-modal').addEventListener('click', closeModal);
+  $('cancel-modal').addEventListener('click', closeModal);
+  $('edit-modal').addEventListener('click', e => { if(e.target === $('edit-modal')) closeModal(); });
+  $('settings-form').addEventListener('submit', e => {
+    e.preventDefault();
+    data.className = $('class-name-input').value.trim() || 'Lớp học';
+    data.week = Math.max(1, Math.min(99, Number($('week-input').value) || currentWeek));
+    skills.forEach(s => {
+      let url = $(s+'-url').value.trim();
+      if(url && !/^https?:\/\//i.test(url)) url = '';
+      data.links[s] = url;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    closeModal(); render();
+  });
+  render();
+  if (window.lucide) lucide.createIcons();
+})();
+</script>
+</body>
+</html>
