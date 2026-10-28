@@ -128,10 +128,15 @@ button,a,input{transition:all .16s ease}
   const weekEnd = new Date(weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
   const fmt = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,' ');
+  const pageParams = new URLSearchParams(window.location.search);
+  const urlClassName = pageParams.get('class') || pageParams.get('className') || '';
+  const studentName = pageParams.get('student') || pageParams.get('studentName') || '';
   let data = {className:'Tên lớp', week:currentWeek, links:{reading:'',listening:'',writing:'',speaking:''}};
   try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); if(saved && typeof saved==='object') data = {...data,...saved,links:{...data.links,...(saved.links||{})}}; } catch(e) {}
   // If the saved week is stale, follow the current week unless the teacher explicitly set a different week.
   if (!data.week || Number(data.week) < 1) data.week = currentWeek;
+  // Explicit URL parameters override the saved class label; student identity is passed to each exercise link.
+  if (urlClassName) data.className = urlClassName;
 
   function render() {
     $('page-class-name').textContent = data.className || 'Lớp học';
@@ -145,7 +150,13 @@ button,a,input{transition:all .16s ease}
       const a = card.querySelector('.open-link'), status = card.querySelector('.skill-status');
       if (url && /^https?:\/\//i.test(url)) {
         count++; card.classList.add('has-link');
-        a.href = url; a.classList.remove('opacity-50','pointer-events-none');
+        // Pass class, student, skill and week metadata to the exercise page.
+        const targetUrl = new URL(url, window.location.href);
+        targetUrl.searchParams.set('class', data.className || '');
+        targetUrl.searchParams.set('student', studentName);
+        targetUrl.searchParams.set('skill', skill);
+        targetUrl.searchParams.set('week', String(data.week || currentWeek));
+        a.href = targetUrl.toString(); a.classList.remove('opacity-50','pointer-events-none');
         status.textContent = 'Sẵn sàng'; status.className = 'skill-status text-xs font-bold text-emerald-600';
       } else {
         card.classList.remove('has-link');
